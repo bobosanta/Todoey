@@ -10,7 +10,7 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
 
-    let itemArray = ["1","2","3"]
+    let itemArray = ["Learn iOS","Be a dev","Make bank"]
     
     
     override func viewDidLoad() {
@@ -33,9 +33,16 @@ class TodoListViewController: UITableViewController {
         
     }
     
+    //    MARK: Table view Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    
+        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        } else {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        }
         
-        
+        tableView.deselectRow(at: indexPath, animated: true)
         
     }
     
