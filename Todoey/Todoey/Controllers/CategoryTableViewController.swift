@@ -8,8 +8,9 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
-class CategoryTableViewController: UITableViewController {
+class CategoryTableViewController: SwipeTableViewController {
     
     let realm = try! Realm()
     
@@ -19,6 +20,8 @@ class CategoryTableViewController: UITableViewController {
         super.viewDidLoad()
 
         loadCategories()
+
+        tableView.separatorStyle = .none
         
     }
 
@@ -29,9 +32,13 @@ class CategoryTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
-        cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No Categories Added Yet"
+        if let category = categoryArray?[indexPath.row] {
+            cell.textLabel?.text = category.name ?? "No Categories Added Yet"
+            
+            cell.backgroundColor = UIColor(hexString: category.color ?? "1D9BF6")
+        }
         
         return cell
         
@@ -48,6 +55,7 @@ class CategoryTableViewController: UITableViewController {
             
             let newCategory = Category()
             newCategory.name = textField.text!
+            newCategory.color = UIColor.randomFlat.hexValue()
             
             self.save(category: newCategory)
             
@@ -101,11 +109,25 @@ class CategoryTableViewController: UITableViewController {
     func loadCategories() {
 
         categoryArray = realm.objects(Category.self)
+        
         self.tableView.reloadData()
+        
     }
     
-   
-    
+    //    MARK: Delete data from swipe
+    override func updateModel(at indexPath: IndexPath) {
+        if let categoryForDeletion = self.categoryArray?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(categoryForDeletion)
+                }
+            } catch {
+                print("Error deleting category \(error)")
+            }
+        }
+    }
     
     
 }
+
+
